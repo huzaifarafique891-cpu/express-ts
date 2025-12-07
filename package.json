@@ -24,7 +24,8 @@
     "format:check": "prettier --check .",
     "test": "vitest",
     "test:run": "vitest run",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "prepare": "husky"
   },
   "dependencies": {
     "express": "^5.2.1"
@@ -38,6 +39,8 @@
     "@vitest/coverage-v8": "^4.0.15",
     "@vitest/eslint-plugin": "^1.5.1",
     "eslint": "^9.39.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.7.4",
     "supertest": "^7.1.4",
     "typescript": "^5.9.3",

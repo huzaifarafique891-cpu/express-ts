@@ -48,6 +48,10 @@ npm start
 - **Prettier 3.7** - Code formatter
 - **@vitest/eslint-plugin** - Vitest-specific lint rules
 
+#### Git Hooks
+- **Husky 9.1** - Git hooks manager
+- **lint-staged 16.2** - Run linters on staged files only
+
 #### TypeScript Configuration
 - **@tsconfig/node24** - Recommended TypeScript config for Node.js 24
 
@@ -157,6 +161,16 @@ describe('GET /api/users', () => {
 - Vitest plugin for test files
 - Ignores compiled JavaScript
 
+### `.lintstagedrc.json`
+- Configured for TypeScript files: ESLint fix → Prettier format → TypeScript check
+- Prettier formatting for JSON and JavaScript files
+- Prevents commits with linting or type errors
+
+### `.husky/pre-commit`
+- Runs lint-staged before each commit
+- Automatically fixes issues in staged files
+- Prevents broken code from being committed
+
 ### `.env` Support
 Environment variables can be loaded via `--env-file=.env` flag (already configured in npm scripts)
 
@@ -183,8 +197,49 @@ The built application will run from the `dist/` directory.
 4. **Lint code**: `npm run lint` (or `npm run lint:fix` to auto-fix)
 5. **Format code**: `npm run format`
 6. **Run tests**: `npm test`
-7. **Build**: `npm run build`
-8. **Deploy**: `npm start`
+7. **Commit code**: `git commit` (Husky automatically runs pre-commit checks)
+8. **Build**: `npm run build`
+9. **Deploy**: `npm start`
+
+## 🤖 Git Hooks with Husky
+
+This template uses **Husky** to automatically enforce code quality on every commit.
+
+### How It Works
+
+When you run `git commit`, the pre-commit hook automatically:
+1. ✅ **Fixes ESLint issues** on staged TypeScript files
+2. ✅ **Formats code** with Prettier
+3. ✅ **Checks TypeScript types** for errors
+4. ✅ Commits only if all checks pass
+
+### Example
+
+```bash
+# Make changes
+echo 'const x = 1' >> src/example.ts
+
+# Stage and commit
+git add src/example.ts
+git commit -m "Add example"
+
+# Output:
+# ✔ Backed up original state
+# ✔ Running tasks for staged files...
+# ✔ Applying modifications from tasks...
+# ✔ Cleaning up temporary files...
+# [main abc1234] Add example
+```
+
+Your code is automatically cleaned up before commit!
+
+### Skip Hooks (Emergency Only)
+
+```bash
+git commit --no-verify
+```
+
+⚠️ **Only use `--no-verify` in emergencies.** It bypasses all code quality checks.
 
 ## 🔍 Code Quality Best Practices
 
