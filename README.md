@@ -7,10 +7,12 @@ A production-ready starter template for building REST APIs with Express and Type
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js 24+ (or compatible version)
 - npm or yarn
 
 ### Setup
+
 ```bash
 # Install dependencies
 npm install
@@ -31,6 +33,7 @@ npm start
 ## 📋 What's Included
 
 ### Core Dependencies
+
 - **Express 5.2.1** - Modern web framework for Node.js
 - **TypeScript 5.9** - Type-safe JavaScript
 - **Node.js 24** - Latest stable runtime
@@ -38,21 +41,25 @@ npm start
 ### Developer Tools
 
 #### Testing
+
 - **Vitest 4.0** - Lightning-fast unit test framework
 - **Supertest 7.1** - HTTP assertion library for testing Express routes
 - **@vitest/coverage-v8** - Code coverage reporting
 
 #### Code Quality
+
 - **ESLint 9.39** - Static code analysis
 - **TypeScript ESLint** - TypeScript-specific linting rules
 - **Prettier 3.7** - Code formatter
 - **@vitest/eslint-plugin** - Vitest-specific lint rules
 
 #### Git Hooks
+
 - **Husky 9.1** - Git hooks manager
 - **lint-staged 16.2** - Run linters on staged files only
 
 #### TypeScript Configuration
+
 - **@tsconfig/node24** - Recommended TypeScript config for Node.js 24
 
 ## 📝 Available Scripts
@@ -96,16 +103,19 @@ src/
 ### Running Tests
 
 **Watch Mode (Development)**
+
 ```bash
 npm test
 ```
 
 **Single Run (CI/Production)**
+
 ```bash
 npm test:run
 ```
 
 **With Coverage Report**
+
 ```bash
 npm coverage
 ```
@@ -125,19 +135,18 @@ describe('GET /api/users', () => {
       .get('/api/users')
       .expect(200)
       .expect('Content-Type', /json/);
-    
+
     expect(response.body).toBeInstanceOf(Array);
   });
 
   it('should handle errors', async () => {
-    await request(app)
-      .get('/api/invalid')
-      .expect(404);
+    await request(app).get('/api/invalid').expect(404);
   });
 });
 ```
 
 ### Test Configuration
+
 - **Environment:** Node.js
 - **Globals Enabled:** `describe`, `it`, `expect` available without imports
 - **Coverage Exclusions:** Entry point, test files, dist/, node_modules/
@@ -145,43 +154,51 @@ describe('GET /api/users', () => {
 ## 🔧 Configuration Files
 
 ### `tsconfig.json`
+
 - Extends `@tsconfig/node24` for Node.js 24
 - Output: `./dist`
 - Includes Vitest global types
 
 ### `vitest.config.ts`
+
 - Node environment
 - Global test API enabled
 - v8 coverage provider configured
 - Coverage excludes: node_modules, tests, dist, entry point
 
 ### `eslint.config.js`
+
 - ESLint recommended rules
 - TypeScript strict type checking
 - Vitest plugin for test files
 - Ignores compiled JavaScript
 
 ### `.lintstagedrc.json`
+
 - Configured for TypeScript files: ESLint fix → Prettier format → TypeScript check
 - Prettier formatting for JSON and JavaScript files
 - Prevents commits with linting or type errors
 
 ### `.husky/pre-commit`
+
 - Runs lint-staged before each commit
 - Automatically fixes issues in staged files
 - Prevents broken code from being committed
 
 ### `.env` Support
+
 Environment variables can be loaded via `--env-file=.env` flag (already configured in npm scripts)
 
 ## 📦 Building for Production
 
 ### Development Build
+
 ```bash
 npm run build
 ```
 
 ### Production Deployment
+
 ```bash
 npm run build
 npm start
@@ -208,6 +225,7 @@ This template uses **Husky** to automatically enforce code quality on every comm
 ### How It Works
 
 When you run `git commit`, the pre-commit hook automatically:
+
 1. ✅ **Fixes ESLint issues** on staged TypeScript files
 2. ✅ **Formats code** with Prettier
 3. ✅ **Checks TypeScript types** for errors
@@ -248,6 +266,7 @@ This project uses GitHub Actions to validate code on every push and pull request
 ### CI Pipeline
 
 The CI workflow runs on:
+
 - ✅ Every push to `main` branch
 - ✅ Every pull request to `main` branch
 
@@ -263,11 +282,11 @@ The CI workflow runs on:
 
 Since **Husky pre-commit hooks** automatically fix linting and formatting issues locally:
 
-| Scenario | What Happens | Your Action |
-|----------|--------------|------------|
-| ✅ Code is clean | CI passes automatically | Push and merge normally |
-| ❌ Tests fail | CI fails | Fix the failing tests locally, commit, push again |
-| ❌ Type errors | CI fails | Fix TypeScript errors, commit, push again |
+| Scenario                 | What Happens                               | Your Action                                                 |
+| ------------------------ | ------------------------------------------ | ----------------------------------------------------------- |
+| ✅ Code is clean         | CI passes automatically                    | Push and merge normally                                     |
+| ❌ Tests fail            | CI fails                                   | Fix the failing tests locally, commit, push again           |
+| ❌ Type errors           | CI fails                                   | Fix TypeScript errors, commit, push again                   |
 | ⚠️ Linting/format issues | **Should never happen** (Husky fixes them) | If CI fails on lint/format, something went wrong with Husky |
 
 ### Why This Approach?
@@ -288,21 +307,25 @@ Husky should prevent lint/format issues from being committed, but if they reach 
 ## 🔍 Code Quality Best Practices
 
 ### TypeScript Strict Mode
+
 - Strict type checking enabled
 - No implicit `any` types
 - Run `npm run typecheck` before commits
 
 ### Linting
+
 - Run `npm run lint:fix` before committing
 - ESLint enforces consistent code style
 - Vitest-specific rules for test files
 
 ### Formatting
+
 - Run `npm run format` to format all files
 - Check formatting with `npm run format:check`
 - Prettier ensures consistent code style
 
 ### Testing
+
 - Write tests alongside features
 - Aim for meaningful coverage (> 80%)
 - Use Supertest for HTTP endpoint testing
@@ -310,6 +333,7 @@ Husky should prevent lint/format issues from being committed, but if they reach 
 ## 📚 Common Tasks
 
 ### Adding a New Route
+
 ```typescript
 // src/api/users.ts
 import express from 'express';
@@ -324,6 +348,7 @@ export default router;
 ```
 
 ### Testing the Route
+
 ```typescript
 // src/tests/unit/api/users.test.ts
 import { describe, it, expect } from 'vitest';
@@ -332,16 +357,15 @@ import { app } from '../../../index.js';
 
 describe('GET /api/users', () => {
   it('should return users', async () => {
-    const response = await request(app)
-      .get('/api/users')
-      .expect(200);
-    
+    const response = await request(app).get('/api/users').expect(200);
+
     expect(response.body).toBeInstanceOf(Array);
   });
 });
 ```
 
 ### Adding Dependencies
+
 ```bash
 # Production dependency
 npm install express-validator
@@ -352,29 +376,35 @@ npm install --save-dev @types/some-package
 
 ## 🐛 Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
+| Issue                       | Solution                                                      |
+| --------------------------- | ------------------------------------------------------------- |
 | `Cannot find module` errors | Run `npm install` and verify import paths use `.js` extension |
-| Type errors after changes | Run `npm run typecheck` |
-| Linting errors | Run `npm run lint:fix` |
-| Tests failing | Check `npm test` output and review test files |
-| Port already in use | Change `PORT` env var or kill process on port 3000 |
+| Type errors after changes   | Run `npm run typecheck`                                       |
+| Linting errors              | Run `npm run lint:fix`                                        |
+| Tests failing               | Check `npm test` output and review test files                 |
+| Port already in use         | Change `PORT` env var or kill process on port 3000            |
 
 ## 🔐 Type Safety
 
 This template uses TypeScript strict mode. Key benefits:
+
 - Catch errors at compile time
 - Better IDE autocomplete
 - Self-documenting code through types
 - Easier refactoring
 
 Always aim for proper TypeScript types in your code:
+
 ```typescript
 // ❌ Avoid
-const getUser = (id: any) => { /* ... */ };
+const getUser = (id: any) => {
+  /* ... */
+};
 
 // ✅ Preferred
-const getUser = (id: number): Promise<User> => { /* ... */ };
+const getUser = (id: number): Promise<User> => {
+  /* ... */
+};
 ```
 
 ## 📖 Useful Resources

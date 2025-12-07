@@ -5,4 +5,4 @@ export const createTestApp = () => {
   const app = express();
   app.use(router);
   return app;
-}
+};
