@@ -241,6 +241,50 @@ git commit --no-verify
 
 ⚠️ **Only use `--no-verify` in emergencies.** It bypasses all code quality checks.
 
+## 🔄 Continuous Integration (CI)
+
+This project uses GitHub Actions to validate code on every push and pull request.
+
+### CI Pipeline
+
+The CI workflow runs on:
+- ✅ Every push to `main` branch
+- ✅ Every pull request to `main` branch
+
+### What CI Validates
+
+1. **Tests** - All tests must pass (`npm test:run`)
+2. **TypeScript Types** - No type errors allowed (`npm typecheck`)
+3. **Code Style** - ESLint validation (`npm lint`)
+4. **Code Formatting** - Prettier validation (`npm format:check`)
+5. **Coverage Report** - Code coverage metrics (`npm coverage`)
+
+### Developer Expectations
+
+Since **Husky pre-commit hooks** automatically fix linting and formatting issues locally:
+
+| Scenario | What Happens | Your Action |
+|----------|--------------|------------|
+| ✅ Code is clean | CI passes automatically | Push and merge normally |
+| ❌ Tests fail | CI fails | Fix the failing tests locally, commit, push again |
+| ❌ Type errors | CI fails | Fix TypeScript errors, commit, push again |
+| ⚠️ Linting/format issues | **Should never happen** (Husky fixes them) | If CI fails on lint/format, something went wrong with Husky |
+
+### Why This Approach?
+
+- **Local feedback is fast** - Husky catches issues before push
+- **CI validates final state** - Ensures nothing slipped through
+- **No time wasted** - CI doesn't re-fix code, only validates
+- **Clean git history** - All committed code meets standards
+
+### If CI Fails
+
+1. **Tests failing?** → Fix the code and commit
+2. **Type errors?** → Fix types and commit
+3. **Lint/format errors?** → Run `npm run lint:fix` and `npm run format` locally, then commit
+
+Husky should prevent lint/format issues from being committed, but if they reach CI, the fix is simple.
+
 ## 🔍 Code Quality Best Practices
 
 ### TypeScript Strict Mode
