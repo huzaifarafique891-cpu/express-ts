@@ -4,6 +4,47 @@ A production-ready starter template for building REST APIs with Express and Type
 
 **Date Published:** Dec 2025
 
+## 📚 Table of Contents
+
+- [Quick Start](#-quick-start) - Get up and running in minutes
+- [What's Included](#-whats-included) - Core dependencies and developer tools
+- [Available Scripts](#-available-scripts) - All npm commands at a glance
+- [Project Structure](#-project-structure) - How the code is organized
+- [Testing Guide](#-testing-guide) - Writing and running tests
+- [Configuration Files](#-configuration-files) - Understanding the config setup
+- [Building for Production](#-building-for-production) - Preparing for deployment
+- [Docker & Containerization](#-docker--containerization) - Containerize your app
+- [Kubernetes Deployment](#️-kubernetes-deployment) - Deploy to Kubernetes
+- [Development Workflow](#-development-workflow) - Best practices for daily work
+- [Git Hooks with Husky](#-git-hooks-with-husky) - Automated code quality
+- [Continuous Integration](#-continuous-integration) - GitHub Actions CI/CD
+- [Best Practices](#-best-practices-for-this-template) - Pro tips and patterns
+- [Common Tasks](#-common-tasks) - How-to guides for common operations
+- [Troubleshooting](#-troubleshooting) - Common issues and solutions
+- [Type Safety](#-type-safety) - Getting the most from TypeScript
+
+## 📖 Summary
+
+**What is this?** A complete, production-ready Express API starter with TypeScript, testing, Docker, and Kubernetes support.
+
+**Who is it for?** Developers building REST APIs who want:
+- Strong type safety with TypeScript
+- Automated testing (unit and integration)
+- Enforced code quality (linting, formatting)
+- Containerization and orchestration ready
+- Best practices out of the box
+
+**Key Features:**
+- ✅ **Express 5.2.1** with ES modules
+- ✅ **TypeScript 5.9** with strict mode
+- ✅ **Vitest 4.0** for fast testing
+- ✅ **Husky + lint-staged** for git hooks
+- ✅ **Docker & Kubernetes** ready
+- ✅ **GitHub Actions** CI/CD pipeline
+- ✅ **Prettier + ESLint** for code quality
+
+**Time to productive:** < 5 minutes with the GitHub CLI template command
+
 ## 🚀 Quick Start
 
 ### Prerequisites

@@ -9,7 +9,7 @@
     "vitest",
     "template"
   ],
-  "license": "ISC",
+  "license": "MIT",
   "main": "index.js",
   "type": "module",
   "scripts": {
