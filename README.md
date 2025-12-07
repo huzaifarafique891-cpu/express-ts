@@ -11,16 +11,20 @@ A production-ready starter template for building REST APIs with Express and Type
 - Node.js 24+ (or compatible version)
 - npm or yarn
 
-### Setup
+### Using This Template
 
 ```bash
+# Clone or use as template
+git clone <your-repo-url>
+cd express-ts
+
 # Install dependencies
 npm install
 
 # Start development server
 npm run dev
 
-# Run tests
+# Run tests in watch mode
 npm test
 
 # Build for production
@@ -30,37 +34,42 @@ npm run build
 npm start
 ```
 
+**Next Steps:**
+1. Update `package.json` with your project name, description, and author
+2. Update `README.md` with your project details
+3. Set up environment variables in `.env` (copy from `.env.example` if available)
+4. Remove example code from `src/sum.ts` and tests
+5. Start building your API!
+
 ## 📋 What's Included
+
+This template provides everything you need for professional Express API development:
 
 ### Core Dependencies
 
-- **Express 5.2.1** - Modern web framework for Node.js
-- **TypeScript 5.9** - Type-safe JavaScript
-- **Node.js 24** - Latest stable runtime
+- **Express 5.2.1** - Modern, minimalist web framework
+- **TypeScript 5.9** - Type-safe JavaScript with strict mode enabled
+- **Node.js 24** - Latest stable runtime with modern JavaScript support
 
-### Developer Tools
+### Developer Tools (Pre-configured)
 
-#### Testing
+#### 🧪 Testing Stack
+- **Vitest 4.0** - Lightning-fast unit test framework with auto-reload
+- **Supertest 7.1** - HTTP assertion library for testing Express endpoints
+- **@vitest/coverage-v8** - Comprehensive code coverage reporting
 
-- **Vitest 4.0** - Lightning-fast unit test framework
-- **Supertest 7.1** - HTTP assertion library for testing Express routes
-- **@vitest/coverage-v8** - Code coverage reporting
+#### 🔍 Code Quality
+- **ESLint 9.39** - Enforce consistent code style and catch errors
+- **TypeScript ESLint** - Advanced TypeScript-specific lint rules
+- **Prettier 3.7** - Automatic code formatting
+- **@vitest/eslint-plugin** - Best practices for test files
 
-#### Code Quality
+#### 🎣 Git Integration
+- **Husky 9.1** - Automated git hooks for code quality checks
+- **lint-staged 16.2** - Run quality tools only on changed files
 
-- **ESLint 9.39** - Static code analysis
-- **TypeScript ESLint** - TypeScript-specific linting rules
-- **Prettier 3.7** - Code formatter
-- **@vitest/eslint-plugin** - Vitest-specific lint rules
-
-#### Git Hooks
-
-- **Husky 9.1** - Git hooks manager
-- **lint-staged 16.2** - Run linters on staged files only
-
-#### TypeScript Configuration
-
-- **@tsconfig/node24** - Recommended TypeScript config for Node.js 24
+#### 📦 TypeScript Configuration
+- **@tsconfig/node24** - Production-ready TypeScript configuration for Node.js 24
 
 ## 📝 Available Scripts
 
@@ -90,57 +99,93 @@ npm run typecheck        # Check TypeScript types without building
 
 ```
 src/
-├── index.ts             # Express app entry point
-├── sum.ts               # Example utility function
+├── index.ts              # Express app entry point (export app, start server)
+├── routes/               # API route handlers (create as needed)
+│   └── index.ts
+├── middleware/           # Express middleware (create as needed)
+├── utils/                # Helper functions and utilities
+├── types/                # TypeScript type definitions
 └── tests/
-    └── unit/
-        ├── sum.test.ts  # Unit tests for utilities
-        └── vitest.d.ts  # Vitest type definitions
+    ├── unit/             # Unit tests for utilities and functions
+    │   └── sum.test.ts
+    ├── e2e/              # End-to-end tests for API routes
+    ├── helper/           # Test utilities and fixtures
+    └── vitest.d.ts
 ```
+
+**Note:** The example `sum.ts` file is for demonstration. Replace it with your actual business logic.
 
 ## 🧪 Testing Guide
 
 ### Running Tests
 
-**Watch Mode (Development)**
-
 ```bash
+# Watch mode - auto-rerun on file changes (development)
 npm test
-```
 
-**Single Run (CI/Production)**
-
-```bash
+# Single run - exits after completion (CI/production)
 npm test:run
-```
 
-**With Coverage Report**
-
-```bash
+# With coverage report
 npm coverage
 ```
 
-### Example Test with Supertest
+### Writing Tests
 
-Test your Express routes with Supertest:
+#### Unit Test Example
 
 ```typescript
+// src/tests/unit/calculator.test.ts
+import { describe, it, expect } from 'vitest';
+import { add, multiply } from '../../utils/calculator';
+
+describe('Calculator Utils', () => {
+  describe('add', () => {
+    it('should add two numbers', () => {
+      expect(add(2, 3)).toBe(5);
+    });
+  });
+
+  describe('multiply', () => {
+    it('should multiply two numbers', () => {
+      expect(multiply(2, 3)).toBe(6);
+    });
+  });
+});
+```
+
+#### E2E Test Example (API Route Testing with Supertest)
+
+```typescript
+// src/tests/e2e/users.spec.ts
 import { describe, it, expect } from 'vitest';
 import request from 'supertest';
 import { app } from '../../index.js';
 
 describe('GET /api/users', () => {
-  it('should return all users', async () => {
+  it('should return all users with 200 status', async () => {
     const response = await request(app)
       .get('/api/users')
       .expect(200)
       .expect('Content-Type', /json/);
 
     expect(response.body).toBeInstanceOf(Array);
+    expect(response.body.length).toBeGreaterThan(0);
   });
 
-  it('should handle errors', async () => {
-    await request(app).get('/api/invalid').expect(404);
+  it('should handle invalid endpoints with 404', async () => {
+    await request(app)
+      .get('/api/invalid')
+      .expect(404);
+  });
+
+  it('should validate request body', async () => {
+    const response = await request(app)
+      .post('/api/users')
+      .send({ invalid: 'data' })
+      .expect(400);
+
+    expect(response.body).toHaveProperty('error');
   });
 });
 ```
@@ -148,7 +193,8 @@ describe('GET /api/users', () => {
 ### Test Configuration
 
 - **Environment:** Node.js
-- **Globals Enabled:** `describe`, `it`, `expect` available without imports
+- **Globals:** `describe`, `it`, `expect` available without imports (auto-imported)
+- **Coverage Tracking:** v8 provider configured
 - **Coverage Exclusions:** Entry point, test files, dist/, node_modules/
 
 ## 🔧 Configuration Files
@@ -175,9 +221,10 @@ describe('GET /api/users', () => {
 
 ### `.lintstagedrc.json`
 
-- Configured for TypeScript files: ESLint fix → Prettier format → TypeScript check
+- Configured for TypeScript files: ESLint fix → Prettier format
 - Prettier formatting for JSON and JavaScript files
-- Prevents commits with linting or type errors
+- Type checking is handled separately in CI/locally via `npm run typecheck`
+- Keeps pre-commit hook fast and focused on linting & formatting
 
 ### `.husky/pre-commit`
 
@@ -208,15 +255,39 @@ The built application will run from the `dist/` directory.
 
 ## 💡 Development Workflow
 
-1. **Write TypeScript** in `src/`
-2. **Write tests** in `src/tests/`
-3. **Check types**: `npm run typecheck`
-4. **Lint code**: `npm run lint` (or `npm run lint:fix` to auto-fix)
-5. **Format code**: `npm run format`
-6. **Run tests**: `npm test`
-7. **Commit code**: `git commit` (Husky automatically runs pre-commit checks)
-8. **Build**: `npm run build`
-9. **Deploy**: `npm start`
+### Standard Development Process
+
+1. **Start dev server** - `npm run dev` (hot-reload enabled)
+2. **Write TypeScript** - Add code in `src/`
+3. **Write tests** - Add tests in `src/tests/`
+4. **Run tests** - `npm test` (watch mode auto-reruns)
+5. **Type check** - `npm run typecheck` (before committing)
+6. **Commit** - `git commit` (Husky auto-fixes linting/formatting)
+7. **Push** - CI validates all checks
+8. **Deploy** - `npm run build && npm start`
+
+### Pre-Commit Quality Gates
+
+Code quality is enforced locally to catch issues early:
+
+```bash
+# Automatic (Husky pre-commit hook)
+git add .
+git commit -m "Your message"
+# Husky runs: ESLint fix → Prettier format → commits if clean
+```
+
+### Manual Quality Checks
+
+Run these anytime to verify code quality:
+
+```bash
+npm run typecheck      # Check TypeScript types
+npm run lint           # Check for linting issues
+npm run lint:fix       # Fix linting issues automatically
+npm run format         # Format all files
+npm run format:check   # Check formatting without changing files
+```
 
 ## 🤖 Git Hooks with Husky
 
@@ -228,8 +299,9 @@ When you run `git commit`, the pre-commit hook automatically:
 
 1. ✅ **Fixes ESLint issues** on staged TypeScript files
 2. ✅ **Formats code** with Prettier
-3. ✅ **Checks TypeScript types** for errors
-4. ✅ Commits only if all checks pass
+3. ✅ Commits only if linting and formatting pass
+
+**Note:** TypeScript type checking is not included in the pre-commit hook (it runs in CI and can be checked manually with `npm run typecheck`). This keeps commits fast while CI ensures type safety.
 
 ### Example
 
@@ -304,75 +376,278 @@ Since **Husky pre-commit hooks** automatically fix linting and formatting issues
 
 Husky should prevent lint/format issues from being committed, but if they reach CI, the fix is simple.
 
-## 🔍 Code Quality Best Practices
+## 🎯 Best Practices for This Template
 
-### TypeScript Strict Mode
+### Project Setup Checklist
 
-- Strict type checking enabled
-- No implicit `any` types
-- Run `npm run typecheck` before commits
+- [ ] Update `package.json` with project details
+- [ ] Update `README.md` with your API documentation
+- [ ] Create `.env` file from `.env.example`
+- [ ] Remove example `sum.ts` and tests
+- [ ] Set up your first routes
+- [ ] Configure any needed middleware (CORS, authentication, etc.)
+- [ ] Add database/ORM setup if needed
+- [ ] Set up environment-specific configs
 
-### Linting
+### Code Organization
 
-- Run `npm run lint:fix` before committing
-- ESLint enforces consistent code style
-- Vitest-specific rules for test files
+**By Feature (Recommended for larger projects):**
+```
+src/
+├── features/
+│   ├── users/
+│   │   ├── routes.ts
+│   │   ├── controller.ts
+│   │   ├── service.ts
+│   │   └── tests/
+│   ├── posts/
+│   │   ├── routes.ts
+│   │   ├── controller.ts
+│   │   └── tests/
+│   └── auth/
+│       ├── middleware.ts
+│       ├── service.ts
+│       └── tests/
+├── shared/
+│   ├── middleware/
+│   ├── utils/
+│   ├── types/
+│   └── errors/
+└── index.ts
+```
 
-### Formatting
+**By Layer (Recommended for smaller projects):**
+```
+src/
+├── routes/
+├── controllers/
+├── services/
+├── middleware/
+├── utils/
+├── types/
+├── tests/
+└── index.ts
+```
 
-- Run `npm run format` to format all files
-- Check formatting with `npm run format:check`
-- Prettier ensures consistent code style
+### TypeScript Tips
 
-### Testing
+1. **Always define return types** - Helps with documentation and catches errors
+   ```typescript
+   // ❌ Avoid
+   const getUser = async (id) => { /* ... */ };
+   
+   // ✅ Good
+   const getUser = async (id: number): Promise<User> => { /* ... */ };
+   ```
 
-- Write tests alongside features
-- Aim for meaningful coverage (> 80%)
-- Use Supertest for HTTP endpoint testing
+2. **Use interfaces for request/response types** - Makes API contracts clear
+   ```typescript
+   interface CreateUserRequest {
+     name: string;
+     email: string;
+   }
+   
+   interface UserResponse {
+     id: number;
+     name: string;
+     email: string;
+     createdAt: Date;
+   }
+   ```
+
+3. **Leverage TypeScript strict mode** - It's enabled for a reason
+   ```typescript
+   // Strict mode catches these at compile time
+   const value: string = null;        // ❌ Error
+   const data: any = {};              // ❌ Avoid
+   ```
+
+### Testing Best Practices
+
+1. **Test behavior, not implementation** - Focus on what users/APIs experience
+2. **Write tests alongside features** - Not after
+3. **Aim for meaningful coverage** - 80%+ coverage is good, but focus on critical paths
+4. **Use descriptive test names** - `should return 404 when user not found` is better than `test get user`
+5. **Test happy path AND error cases** - Both matter equally
+
+### Git Workflow
+
+1. **Commit frequently** - Small, logical commits are easier to review
+2. **Write good commit messages** - Follow conventional commits if possible
+   ```bash
+   # Good
+   git commit -m "feat: add user authentication endpoint"
+   git commit -m "fix: handle null values in user service"
+   git commit -m "docs: update API documentation"
+   
+   # Bad
+   git commit -m "stuff"
+   git commit -m "fixes"
+   ```
+
+3. **Push to feature branches** - Create PRs for review
+4. **Keep main stable** - All CI checks must pass before merging
 
 ## 📚 Common Tasks
 
-### Adding a New Route
+### Initializing Your Project
+
+After cloning, customize the template:
+
+```bash
+# Update package.json
+npm pkg set name="my-api"
+npm pkg set description="My awesome API"
+npm pkg set author="Your Name"
+
+# Remove example files
+rm src/sum.ts
+rm src/tests/unit/sum.test.ts
+
+# Create your first route
+mkdir -p src/routes
+cat > src/routes/health.ts << 'EOF'
+import { Router } from 'express';
+
+const router = Router();
+
+router.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date() });
+});
+
+export default router;
+EOF
+```
+
+### Adding a New API Route
+
+**Step 1: Create route handler**
 
 ```typescript
-// src/api/users.ts
-import express from 'express';
+// src/routes/users.ts
+import { Router, Request, Response } from 'express';
 
-const router = express.Router();
+const router = Router();
 
-router.get('/', (req, res) => {
-  res.json([{ id: 1, name: 'John' }]);
+// GET /users
+router.get('/', (req: Request, res: Response) => {
+  const users = [
+    { id: 1, name: 'Alice', email: 'alice@example.com' },
+    { id: 2, name: 'Bob', email: 'bob@example.com' },
+  ];
+  res.json(users);
+});
+
+// POST /users
+router.post('/', (req: Request, res: Response) => {
+  const { name, email } = req.body;
+  
+  if (!name || !email) {
+    return res.status(400).json({ error: 'Name and email required' });
+  }
+  
+  const newUser = { id: 3, name, email };
+  res.status(201).json(newUser);
 });
 
 export default router;
 ```
 
-### Testing the Route
+**Step 2: Mount route in main app**
 
 ```typescript
-// src/tests/unit/api/users.test.ts
+// src/index.ts
+import express from 'express';
+import usersRouter from './routes/users.js';
+
+export const app = express();
+
+app.use(express.json());
+app.use('/api/users', usersRouter);
+
+const port = process.env.PORT ?? 3000;
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});
+```
+
+**Step 3: Write tests**
+
+```typescript
+// src/tests/e2e/users.spec.ts
 import { describe, it, expect } from 'vitest';
 import request from 'supertest';
-import { app } from '../../../index.js';
+import { app } from '../../index.js';
 
-describe('GET /api/users', () => {
-  it('should return users', async () => {
-    const response = await request(app).get('/api/users').expect(200);
+describe('Users API', () => {
+  describe('GET /api/users', () => {
+    it('should return list of users', async () => {
+      const response = await request(app)
+        .get('/api/users')
+        .expect(200)
+        .expect('Content-Type', /json/);
 
-    expect(response.body).toBeInstanceOf(Array);
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body[0]).toHaveProperty('id');
+      expect(response.body[0]).toHaveProperty('name');
+      expect(response.body[0]).toHaveProperty('email');
+    });
+  });
+
+  describe('POST /api/users', () => {
+    it('should create a new user', async () => {
+      const response = await request(app)
+        .post('/api/users')
+        .send({ name: 'Charlie', email: 'charlie@example.com' })
+        .expect(201);
+
+      expect(response.body).toHaveProperty('id');
+      expect(response.body.name).toBe('Charlie');
+    });
+
+    it('should validate required fields', async () => {
+      const response = await request(app)
+        .post('/api/users')
+        .send({ name: 'Charlie' })
+        .expect(400);
+
+      expect(response.body).toHaveProperty('error');
+    });
   });
 });
+```
+
+**Step 4: Test it**
+
+```bash
+npm test              # Watch mode - tests auto-run
+npm test:run          # Single run
 ```
 
 ### Adding Dependencies
 
 ```bash
-# Production dependency
-npm install express-validator
+# Production dependencies
+npm install express-validator body-parser
+npm install cors helmet
 
-# Development dependency
-npm install --save-dev @types/some-package
+# Development dependencies
+npm install --save-dev @types/cors @types/helmet
 ```
+
+### Environment Variables
+
+```bash
+# Create .env file (copy from .env.example if it exists)
+cp .env.example .env
+
+# Edit .env with your values
+PORT=3000
+NODE_ENV=development
+DATABASE_URL=postgresql://user:password@localhost:5432/mydb
+```
+
+Environment variables are automatically loaded via `--env-file=.env` in npm scripts.
 
 ## 🐛 Troubleshooting
 
