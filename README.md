@@ -253,6 +253,241 @@ npm start
 
 The built application will run from the `dist/` directory.
 
+## 🐳 Docker & Containerization
+
+This project includes Docker support for easy containerization and deployment.
+
+### Project Structure
+
+```
+express-ts/
+├── Dockerfile           # Production-ready container image
+├── docker-compose.yml   # Local development with Docker
+├── .dockerignore        # Files excluded from Docker build
+└── k8s/                 # Kubernetes deployment configs
+    ├── deployment.yaml  # K8s deployment manifest
+    ├── service.yaml     # K8s service manifest
+    └── README.md        # K8s documentation
+```
+
+### Docker Image Details
+
+- **Base Image:** `node:24-alpine` (lightweight, production-ready)
+- **Build:** TypeScript compiled to `dist/`
+- **Runtime:** Node.js runs compiled JavaScript directly
+- **Port:** 3001 (configurable via `PORT` env var)
+- **Size:** ~200MB (optimized with Alpine)
+
+### Local Docker Development
+
+#### Option 1: Docker Compose (Recommended for Development)
+
+```bash
+# Build and start
+docker-compose up
+
+# Start in background
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop
+docker-compose down
+```
+
+**docker-compose.yml features:**
+- Auto-rebuilds on code changes
+- Loads environment variables
+- Exposes port 3001
+
+#### Option 2: Manual Docker Commands
+
+```bash
+# Build image
+docker build -t express-ts:latest .
+
+# Run container
+docker run -p 3001:3001 --env-file=.env express-ts:latest
+
+# Interactive shell
+docker run -it express-ts:latest sh
+```
+
+### Environment Configuration
+
+**Development (.env.local):**
+```
+PORT=3000
+```
+
+**Production (.env):**
+```
+PORT=3001
+```
+
+**Docker loads from `.env`** - Update as needed for your deployment.
+
+### Docker Cleanup
+
+```bash
+# Stop and remove containers
+docker-compose down -v
+
+# Remove image
+docker rmi express-ts:latest
+
+# Prune all unused resources
+docker system prune -a
+```
+
+## ☸️ Kubernetes Deployment
+
+Deploy to Kubernetes clusters (local Docker Desktop or production cloud).
+
+### Prerequisites
+
+- Kubernetes cluster running (Docker Desktop K8s or cloud provider)
+- `kubectl` CLI installed
+- Docker image available (`express-ts:latest`)
+
+### Quick Start
+
+```bash
+# Enable Kubernetes in Docker Desktop:
+# Settings → Kubernetes tab → Check "Enable Kubernetes" → Apply & Restart
+
+# Deploy
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+
+# Check status
+kubectl get pods
+kubectl get svc
+
+# Access the app
+kubectl port-forward svc/express-ts 3001:3001
+curl http://localhost:3001
+
+# View logs
+kubectl logs -f deployment/express-ts
+
+# Scale to 3 replicas
+kubectl scale deployment express-ts --replicas=3
+
+# Cleanup
+kubectl delete deployment express-ts
+kubectl delete svc express-ts
+```
+
+### Kubernetes Manifests
+
+**deployment.yaml:**
+- 1 replica (configurable)
+- Port 3001 exposed
+- Resource requests: 64Mi memory, 50m CPU
+- Resource limits: 256Mi memory, 500m CPU
+- Image: `express-ts:latest`
+
+**service.yaml:**
+- Type: LoadBalancer
+- External access on port 3001
+- Routes to deployment pods
+
+### Deployment Workflow
+
+```bash
+# 1. Build image locally
+docker build -t express-ts:latest .
+
+# 2. Deploy to K8s
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+
+# 3. Monitor rollout
+kubectl rollout status deployment/express-ts
+
+# 4. Test
+kubectl port-forward svc/express-ts 3001:3001
+# In another terminal: curl http://localhost:3001
+
+# 5. Scale if needed
+kubectl scale deployment express-ts --replicas=5
+
+# 6. Update (after code changes)
+docker build -t express-ts:latest .
+kubectl rollout restart deployment/express-ts
+```
+
+### Common Kubernetes Tasks
+
+```bash
+# View deployment details
+kubectl describe deployment express-ts
+
+# View pod details
+kubectl describe pod <pod-name>
+
+# Stream logs from all pods
+kubectl logs -f deployment/express-ts
+
+# Execute command in pod
+kubectl exec -it <pod-name> -- sh
+
+# Port forward (alternative to LoadBalancer)
+kubectl port-forward pod/<pod-name> 3001:3001
+
+# Get all resources
+kubectl get all
+
+# Check resource usage
+kubectl top pods
+kubectl top nodes
+```
+
+### Production Deployment
+
+For production Kubernetes deployments, consider:
+
+1. **Image Registry:** Push to Docker Hub, ECR, GCR, etc.
+   ```bash
+   docker tag express-ts:latest myregistry/express-ts:v1.0
+   docker push myregistry/express-ts:v1.0
+   ```
+
+2. **Namespace Isolation:**
+   ```yaml
+   metadata:
+     namespace: production
+   ```
+
+3. **Resource Scaling:**
+   - Increase replicas for load balancing
+   - Add HorizontalPodAutoscaler for auto-scaling based on CPU/memory
+
+4. **Health Checks:** Consider adding liveness and readiness probes
+
+5. **Ingress:** Use Ingress controller for better routing
+
+6. **Secrets:** Store sensitive data in K8s Secrets, not in code
+
+7. **Monitoring:** Add Prometheus, Grafana, or similar
+
+### Docker vs Kubernetes
+
+| Aspect | Docker Compose | Kubernetes |
+|--------|---|---|
+| **Use Case** | Local dev, single server | Production, scaling, multi-node |
+| **Complexity** | Simple | Advanced |
+| **Scaling** | Manual | Auto-scaling |
+| **High Availability** | No | Yes |
+| **Learning Curve** | Easy | Steep |
+| **Best For** | Development | Enterprise deployments |
+
+**Current Setup:** 
+- ✅ Docker Compose for local development
+- ✅ Kubernetes configs ready for production use
+
 ## 💡 Development Workflow
 
 ### Standard Development Process
