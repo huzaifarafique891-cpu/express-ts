@@ -13,14 +13,40 @@ A production-ready starter template for building REST APIs with Express and Type
 
 ### Using This Template
 
+#### Option 1: GitHub CLI (Recommended)
+
 ```bash
-# Clone or use as template
-git clone <your-repo-url>
-cd express-ts
+# Create a new repository from this template
+gh repo create my-api --template haryati75/express-ts --public
+
+# Or private repository
+gh repo create my-api --template haryati75/express-ts --private
+
+# Clone and setup
+cd my-api
+npm install
+```
+
+#### Option 2: Git Clone
+
+```bash
+# Clone the repository
+git clone https://github.com/haryati75/express-ts.git my-api
+cd my-api
+
+# Remove template git history and start fresh
+rm -rf .git
+git init
 
 # Install dependencies
 npm install
+```
 
+### Quick Start
+
+Once you've created your project:
+
+```bash
 # Start development server
 npm run dev
 
