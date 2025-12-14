@@ -13,8 +13,9 @@ A production-ready starter template for building REST APIs with Express and Type
 - [Testing Guide](#-testing-guide) - Writing and running tests
 - [Configuration Files](#-configuration-files) - Understanding the config setup
 - [Building for Production](#-building-for-production) - Preparing for deployment
-- [Docker & Containerization](#-docker--containerization) - Containerize your app
-- [Kubernetes Deployment](#️-kubernetes-deployment) - Deploy to Kubernetes
+- [Docker & Containerization](#-docker--containerization) - Containerize your app for local testing
+- [Local Kubernetes Testing](#️-local-kubernetes-testing) - Test K8s locally on Docker Desktop
+- [Production Deployment](./PRODUCTION_DEPLOYMENT.md) - Advanced production deployment guide
 - [Development Workflow](#-development-workflow) - Best practices for daily work
 - [Git Hooks with Husky](#-git-hooks-with-husky) - Automated code quality
 - [Continuous Integration](#-continuous-integration) - GitHub Actions CI/CD
@@ -303,22 +304,47 @@ describe('GET /api/users', () => {
 
 Environment variables can be loaded via `--env-file=.env` flag (already configured in npm scripts)
 
-## 📦 Building for Production
+## 📦 Building & Running
 
-### Development Build
+### Development (Local)
 
 ```bash
-npm run build
+# Run with hot-reload
+npm run dev
+
+# Runs on http://localhost:3000 using .env.local
 ```
 
-### Production Deployment
+### Build for Containerization
 
 ```bash
+# Compile TypeScript
 npm run build
+
+# Creates dist/ directory with compiled JavaScript
+```
+
+### Run Compiled Code
+
+```bash
+# Run compiled output directly
 npm start
+
+# Uses .env file, runs on port 3001
 ```
 
-The built application will run from the `dist/` directory.
+### Run in Docker
+
+```bash
+# Via Docker Compose (recommended for local testing)
+docker-compose up
+
+# Or manually
+docker build -t express-ts:latest .
+docker run -p 3001:3001 --env-file=.env express-ts:latest
+
+# Access at http://localhost:3001
+```
 
 ## 🐳 Docker & Containerization
 
@@ -383,17 +409,22 @@ docker run -it express-ts:latest sh
 
 ### Environment Configuration
 
-**Development (.env.local):**
+**Local Development (.env.local) - NOT in version control:**
 ```
 PORT=3000
 ```
 
-**Production (.env):**
+**Containerized/Docker (.env) - For Docker and Kubernetes:**
 ```
 PORT=3001
 ```
 
-**Docker loads from `.env`** - Update as needed for your deployment.
+**How ports work:**
+- Local dev server: `npm run dev` uses port **3000** (via .env.local)
+- Docker container: Exposes port **3001** internally (via .env in Dockerfile)
+- Host machine: Access via `localhost:3001` when using Docker or Kubernetes
+
+**Note:** Port 3001 is consistent across Docker Compose, Docker, and Kubernetes for consistency.
 
 ### Docker Cleanup
 
@@ -408,152 +439,107 @@ docker rmi express-ts:latest
 docker system prune -a
 ```
 
-## ☸️ Kubernetes Deployment
+## ☸️ Local Kubernetes Testing
 
-Deploy to Kubernetes clusters (local Docker Desktop or production cloud).
+Test your containerized app on Kubernetes locally using Docker Desktop.
+
+**Note:** This template focuses on local testing. For production Kubernetes deployments, see [PRODUCTION_DEPLOYMENT.md](./PRODUCTION_DEPLOYMENT.md).
 
 ### Prerequisites
 
-- Kubernetes cluster running (Docker Desktop K8s or cloud provider)
+- Docker Desktop installed (Windows, Mac, or Linux)
+- Kubernetes enabled in Docker Desktop
 - `kubectl` CLI installed
-- Docker image available (`express-ts:latest`)
 
-### Quick Start
+### Enable Kubernetes in Docker Desktop
 
+1. Open **Docker Desktop Settings**
+2. Go to **Kubernetes** tab
+3. Check **"Enable Kubernetes"**
+4. Click **"Apply & Restart"**
+5. Wait for Kubernetes to start (1-2 minutes)
+
+Verify with:
 ```bash
-# Enable Kubernetes in Docker Desktop:
-# Settings → Kubernetes tab → Check "Enable Kubernetes" → Apply & Restart
-
-# Deploy
-kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/service.yaml
-
-# Check status
-kubectl get pods
-kubectl get svc
-
-# Access the app
-kubectl port-forward svc/express-ts 3001:3001
-curl http://localhost:3001
-
-# View logs
-kubectl logs -f deployment/express-ts
-
-# Scale to 3 replicas
-kubectl scale deployment express-ts --replicas=3
-
-# Cleanup
-kubectl delete deployment express-ts
-kubectl delete svc express-ts
+kubectl cluster-info
+kubectl get nodes
 ```
 
-### Kubernetes Manifests
-
-**deployment.yaml:**
-- 1 replica (configurable)
-- Port 3001 exposed
-- Resource requests: 64Mi memory, 50m CPU
-- Resource limits: 256Mi memory, 500m CPU
-- Image: `express-ts:latest`
-
-**service.yaml:**
-- Type: LoadBalancer
-- External access on port 3001
-- Routes to deployment pods
-
-### Deployment Workflow
+### Local Deployment
 
 ```bash
 # 1. Build image locally
 docker build -t express-ts:latest .
 
-# 2. Deploy to K8s
+# 2. Deploy to local Kubernetes
 kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/service.yaml
 
-# 3. Monitor rollout
-kubectl rollout status deployment/express-ts
+# 3. Check deployment status
+kubectl get pods
+kubectl get svc
 
-# 4. Test
+# 4. Access the app
 kubectl port-forward svc/express-ts 3001:3001
-# In another terminal: curl http://localhost:3001
+# In another terminal:
+curl http://localhost:3001
 
-# 5. Scale if needed
-kubectl scale deployment express-ts --replicas=5
-
-# 6. Update (after code changes)
-docker build -t express-ts:latest .
-kubectl rollout restart deployment/express-ts
-```
-
-### Common Kubernetes Tasks
-
-```bash
-# View deployment details
-kubectl describe deployment express-ts
-
-# View pod details
-kubectl describe pod <pod-name>
-
-# Stream logs from all pods
+# 5. View logs
 kubectl logs -f deployment/express-ts
 
-# Execute command in pod
-kubectl exec -it <pod-name> -- sh
-
-# Port forward (alternative to LoadBalancer)
-kubectl port-forward pod/<pod-name> 3001:3001
-
-# Get all resources
-kubectl get all
-
-# Check resource usage
-kubectl top pods
-kubectl top nodes
+# 6. Cleanup when done
+kubectl delete deployment express-ts
+kubectl delete svc express-ts
 ```
 
-### Production Deployment
+### Testing Scenarios
 
-For production Kubernetes deployments, consider:
+**Scale up to 3 replicas:**
+```bash
+kubectl scale deployment express-ts --replicas=3
+kubectl get pods  # See 3 pods running
+```
 
-1. **Image Registry:** Push to Docker Hub, ECR, GCR, etc.
-   ```bash
-   docker tag express-ts:latest myregistry/express-ts:v1.0
-   docker push myregistry/express-ts:v1.0
-   ```
+**Update after code changes:**
+```bash
+# Rebuild image
+docker build -t express-ts:latest .
 
-2. **Namespace Isolation:**
-   ```yaml
-   metadata:
-     namespace: production
-   ```
+# Restart deployment
+kubectl rollout restart deployment/express-ts
 
-3. **Resource Scaling:**
-   - Increase replicas for load balancing
-   - Add HorizontalPodAutoscaler for auto-scaling based on CPU/memory
+# Monitor rollout
+kubectl rollout status deployment/express-ts
+```
 
-4. **Health Checks:** Consider adding liveness and readiness probes
+**View pod details:**
+```bash
+kubectl describe pod <pod-name>
+kubectl exec -it <pod-name> -- sh  # Shell into pod
+```
 
-5. **Ingress:** Use Ingress controller for better routing
+### Local K8s vs Docker Compose
 
-6. **Secrets:** Store sensitive data in K8s Secrets, not in code
-
-7. **Monitoring:** Add Prometheus, Grafana, or similar
-
-### Docker vs Kubernetes
-
-| Aspect | Docker Compose | Kubernetes |
+| Aspect | Docker Compose | Local K8s |
 |--------|---|---|
-| **Use Case** | Local dev, single server | Production, scaling, multi-node |
-| **Complexity** | Simple | Advanced |
-| **Scaling** | Manual | Auto-scaling |
-| **High Availability** | No | Yes |
-| **Learning Curve** | Easy | Steep |
-| **Best For** | Development | Enterprise deployments |
+| **Use Case** | Simple local testing | Realistic K8s testing |
+| **Complexity** | Simple | Moderate |
+| **Replicas** | Single container | Multiple pods |
+| **Best For** | Single-service apps | Testing orchestration |
 
-**Current Setup:** 
-- ✅ Docker Compose for local development
-- ✅ Kubernetes configs ready for production use
+**Recommendation:** Use Docker Compose for quick iteration, Kubernetes for testing deployment scenarios.
+
+### Production Kubernetes
+
+For production Kubernetes deployments with:
+- Image registries (Docker Hub, ECR, GCR)
+- Auto-scaling (HPA)
+- Health checks (liveness/readiness probes)
+- Ingress routing
+- Secrets management
+- Monitoring
+
+See [PRODUCTION_DEPLOYMENT.md](./PRODUCTION_DEPLOYMENT.md)
 
 ## 💡 Development Workflow
 
@@ -994,7 +980,7 @@ const getUser = (id: number): Promise<User> => {
 
 ## 📄 License
 
-ISC
+MIT
 
 ## 👤 Author
 
