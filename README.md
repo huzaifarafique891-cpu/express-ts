@@ -56,6 +56,7 @@ A production-ready starter template for building REST APIs with Express and Type
 ### Using This Template
 
 #### Option 1: GitHub CLI (Recommended)
+feoufew
 
 ```bash
 # Create a new repository from this template
